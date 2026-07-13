@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DeepWork - Focus Timer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #09090b; /* Base Layer from Style Guidance */
+            color: #F4F4F5;
+            overflow: hidden;
+        }
+        .timer-glow {
+            text-shadow: 0 0 40px rgba(59, 130, 246, 0.25);
+        }
+        .ghost-border {
+            border: 1px solid #3f3f46;
+        }
+        .timer-action {
+            transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+        }
+        .timer-action--start { background: #3B82F6; color: #09090B; }
+        .timer-action--stop { background: #EF4444; color: #F4F4F5; }
+        .timer-action:disabled, .timer-reset:disabled { cursor: not-allowed; opacity: 0.6; }
+        /* Custom scrollbar for deep work aesthetic */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#4b4b52",
+                        "on-secondary": "#303037",
+                        "on-primary-fixed": "#172554",
+                        "surface-variant": "#353437",
+                        "on-tertiary-fixed-variant": "#7f2a21",
+                        "background": "#131315",
+                        "secondary-fixed": "#e3e1ea",
+                        "on-secondary-container": "#bcbbc3",
+                        "inverse-surface": "#e5e1e4",
+                        "inverse-on-surface": "#313032",
+                        "surface-bright": "#39393b",
+                        "surface-container-highest": "#353437",
+                        "inverse-primary": "#2563eb",
+                        "on-tertiary-fixed": "#410001",
+                        "on-surface-variant": "#bccbb9",
+                        "surface-tint": "#60a5fa",
+                        "on-error": "#690005",
+                        "error": "#ffb4ab",
+                        "on-background": "#e5e1e4",
+                        "on-secondary-fixed": "#1b1b21",
+                        "error-container": "#93000a",
+                        "tertiary-container": "#ff8b7c",
+                        "on-tertiary": "#60130d",
+                        "on-surface": "#e5e1e4",
+                        "primary-fixed": "#bfdbfe",
+                        "primary-container": "#2563eb",
+                        "surface-container-lowest": "#0e0e10",
+                        "secondary-fixed-dim": "#c7c5ce",
+                        "outline-variant": "#3f3f46",
+                        "on-secondary-fixed-variant": "#46464d",
+                        "outline": "#71717a",
+                        "primary-fixed-dim": "#60a5fa",
+                        "tertiary-fixed": "#ffdad5",
+                        "secondary": "#c7c5ce",
+                        "tertiary-fixed-dim": "#ffb4a9",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#1d4ed8",
+                        "primary": "#3b82f6",
+                        "on-primary-container": "#eff6ff",
+                        "tertiary": "#ffb5ab",
+                        "surface-dim": "#131315",
+                        "on-primary": "#eff6ff",
+                        "surface-container": "#201f22",
+                        "surface": "#131315",
+                        "surface-container-low": "#1c1b1d",
+                        "on-tertiary-container": "#76231b",
+                        "surface-container-high": "#2a2a2c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "48px",
+                        "stack-md": "16px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="flex min-h-screen">
+<!-- NAVIGATION DRAWER (Left Rail) -->
+<!-- Mandatory Styling from JSON: style_shell_layout, style_bg_color, etc. -->
+<aside class="hidden md:flex flex-col gap-stack-md py-stack-lg fixed left-0 top-0 h-full w-64 bg-surface dark:bg-surface border-r border-outline-variant dark:border-outline-variant z-40">
+<div class="px-6 mb-8">
+<h1 class="font-headline-md text-headline-md text-on-surface">Productivity</h1>
+</div>
+<nav class="flex flex-col gap-2">
+<!-- Calendar Tab (Inactive) -->
+<a class="flex items-center gap-4 py-3 px-6 text-on-surface-variant pl-4 transition-colors hover:bg-surface-container-low cursor-pointer" href="calendar.html">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</a>
+<!-- Focus Timer Tab (Active) -->
+<!-- Active State Logic applied based on page intent (Focus Timer) -->
+<a class="flex items-center gap-4 py-3 px-6 text-primary font-bold border-l-4 border-primary pl-4 transition-colors cursor-pointer" href="focus-timer.html" aria-current="page">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-label-md text-label-md">Focus Timer</span>
+</a>
+</nav>
+<div class="mt-auto px-6 py-4">
+<div class="p-4 bg-surface-container-low rounded-lg ghost-border">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">Daily Goal</p>
+<div class="h-1 bg-surface-container-highest w-full rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+<p class="font-label-sm text-label-sm mt-2">4h / 6h</p>
+</div>
+</div>
+</aside>
+<!-- TOP APP BAR -->
+<header class="fixed top-0 w-full flex justify-between items-center px-gutter h-16 max-w-container-max mx-auto bg-background dark:bg-background text-primary dark:text-primary border-b border-outline-variant dark:border-outline-variant z-30 md:ml-64 md:w-[calc(100%-16rem)]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined cursor-pointer active:scale-95">target</span>
+<span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">DeepWork</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined cursor-pointer active:scale-95 hover:text-primary transition-colors">settings</span>
+</div>
+</header>
+<!-- MAIN CANVAS -->
+<main class="flex-1 ml-0 md:ml-64 min-h-screen md:h-screen pt-16 pb-20 md:pb-0 flex flex-col items-center justify-center relative overflow-y-auto">
+<!-- Atmospheric Background Layer -->
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+
+</div>
+<!-- FOCUS TIMER EXPERIENCE (Centered) -->
+<div class="w-full max-w-3xl px-6 py-8 sm:py-10 flex flex-col items-center z-10">
+<!-- Session Context -->
+<div class="mb-8 text-center">
+<p class="font-label-sm text-label-sm text-[#A1A1AA] tracking-[0.2em] uppercase mb-3" id="session-status" aria-live="polite">No Active Focus Session</p>
+<p class="font-label-sm text-label-sm text-primary mb-2" id="timer-daily-goal">Daily Goal · —</p>
+<div class="flex items-center justify-center gap-2 text-[#F4F4F5]">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="font-body-md text-sm sm:text-body-md text-[#A1A1AA]" id="session-start-time">Ready to focus</span>
+</div>
+</div>
+<!-- Massive Timer Display -->
+<div class="relative group cursor-default w-full flex justify-center">
+<h2 class="font-display text-[clamp(3.3rem,12vw,8.5rem)] md:text-[clamp(5rem,10vw,9.5rem)] leading-none tracking-tighter text-[#F4F4F5] timer-glow transition-all duration-300 whitespace-nowrap" id="main-timer">
+                    00:00:00
+                </h2>
+<!-- Circular Track Overlay -->
+<div class="absolute -inset-4 sm:-inset-8 pointer-events-none opacity-20">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="48" stroke="#27272a" stroke-width="0.5"></circle>
+<circle cx="50" cy="50" fill="none" id="progress-ring" r="48" stroke="#3B82F6" stroke-dasharray="301.59" stroke-dashoffset="301.59" stroke-width="0.5"></circle>
+</svg>
+</div>
+</div>
+<!-- Timer Actions -->
+<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+<button class="timer-action timer-action--start inline-flex items-center justify-center px-8 py-4 font-headline-md text-lg rounded-xl hover:brightness-105 active:brightness-95 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:ring-offset-2 focus:ring-offset-[#09090B] shadow-lg" id="start-btn" type="button" aria-pressed="false" aria-label="Start Focus">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined fill-current" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                    Start Focus
+                </span>
+</button>
+<button class="timer-reset inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#18181B] border border-[#3F3F46] text-[#F4F4F5] font-label-md text-label-md rounded-xl hover:border-[#A1A1AA] hover:bg-[#27272A] active:bg-[#18181B] transition-colors focus:outline-none focus:ring-2 focus:ring-[#A1A1AA] focus:ring-offset-2 focus:ring-offset-[#09090B]" id="reset-btn" type="button">
+<span class="material-symbols-outlined">restart_alt</span>
+                    Reset
+</button>
+</div>
+<!-- Keyboard Shortcut Hint -->
+<div class="mt-7">
+<p class="font-label-sm text-label-sm text-[#A1A1AA] opacity-80">Press <span class="px-2 py-1 ghost-border rounded bg-[#18181B] text-[#F4F4F5]">Space</span> to toggle timer</p>
+</div>
+</div>
+</main>
+<!-- MOBILE NAVIGATION (Suppressed on large screens) -->
+<!-- Destination Count 2: Calendar, Timer -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 pb-safe bg-surface dark:bg-surface border-t border-outline-variant dark:border-outline-variant">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="calendar.html">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="focus-timer.html" aria-current="page">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-label-md text-label-md">Timer</span>
+</a>
+</nav>
+
+<script src="js/storage.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/timer.js"></script>
+</body></html>

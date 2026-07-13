@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DeepWork - Productivity Calendar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "secondary-container": "#4b4b52",
+                "on-secondary": "#303037",
+                "on-primary-fixed": "#172554",
+                "surface-variant": "#353437",
+                "on-tertiary-fixed-variant": "#7f2a21",
+                "background": "#131315",
+                "secondary-fixed": "#e3e1ea",
+                "on-secondary-container": "#bcbbc3",
+                "inverse-surface": "#e5e1e4",
+                "inverse-on-surface": "#313032",
+                "surface-bright": "#39393b",
+                "surface-container-highest": "#353437",
+                "inverse-primary": "#2563eb",
+                "on-tertiary-fixed": "#410001",
+                "on-surface-variant": "#bccbb9",
+                "surface-tint": "#60a5fa",
+                "on-error": "#690005",
+                "error": "#ffb4ab",
+                "on-background": "#e5e1e4",
+                "on-secondary-fixed": "#1b1b21",
+                "error-container": "#93000a",
+                "tertiary-container": "#ff8b7c",
+                "on-tertiary": "#60130d",
+                "on-surface": "#e5e1e4",
+                "primary-fixed": "#bfdbfe",
+                "primary-container": "#2563eb",
+                "surface-container-lowest": "#0e0e10",
+                "secondary-fixed-dim": "#c7c5ce",
+                "outline-variant": "#3f3f46",
+                "on-secondary-fixed-variant": "#46464d",
+                "outline": "#71717a",
+                "primary-fixed-dim": "#60a5fa",
+                "tertiary-fixed": "#ffdad5",
+                "secondary": "#c7c5ce",
+                "tertiary-fixed-dim": "#ffb4a9",
+                "on-error-container": "#ffdad6",
+                "on-primary-fixed-variant": "#1d4ed8",
+                "primary": "#3b82f6",
+                "on-primary-container": "#eff6ff",
+                "tertiary": "#ffb5ab",
+                "surface-dim": "#131315",
+                "on-primary": "#eff6ff",
+                "surface-container": "#201f22",
+                "surface": "#131315",
+                "surface-container-low": "#1c1b1d",
+                "on-tertiary-container": "#76231b",
+                "surface-container-high": "#2a2a2c"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "gutter": "24px",
+                "margin-desktop": "48px",
+                "stack-md": "16px",
+                "margin-mobile": "16px",
+                "unit": "4px",
+                "stack-lg": "32px",
+                "stack-sm": "8px",
+                "container-max": "1200px"
+            },
+            "fontFamily": {
+                "headline-md": ["Inter"],
+                "label-sm": ["JetBrains Mono"],
+                "label-md": ["JetBrains Mono"],
+                "headline-lg": ["Inter"],
+                "display": ["Inter"],
+                "body-lg": ["Inter"],
+                "body-md": ["Inter"]
+            },
+            "fontSize": {
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #09090B;
+            color: #F4F4F5;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .ghost-border {
+            border: 1px solid #3f3f46;
+        }
+        .active-border {
+            border: 1px solid #fafafa;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .calendar-day-cell {
+            overflow: hidden;
+            isolation: isolate;
+        }
+        .calendar-day-cell--selected {
+            box-shadow: inset 0 0 0 1px #3B82F6;
+        }
+        .calendar-day-cell--selected .calendar-day-number {
+            color: #60A5FA;
+            font-weight: 700;
+        }
+        .calendar-day-cell--outside { opacity: 0.52; }
+        .calendar-cell-content { position: relative; z-index: 2; }
+        .calendar-today-indicator {
+            position: relative;
+            z-index: 3;
+            width: 6px;
+            height: 6px;
+            border-radius: 9999px;
+            background: #3B82F6;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.55);
+        }
+        .calendar-water {
+            position: absolute;
+            z-index: 1;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            height: var(--water-level, 0%);
+            overflow: hidden;
+            pointer-events: none;
+            background: rgba(37, 99, 235, 0.28);
+            transition: height 600ms ease;
+        }
+        .calendar-water::before,
+        .calendar-water::after {
+            position: absolute;
+            top: -12px;
+            left: -30%;
+            width: 160%;
+            height: 24px;
+            content: "";
+            border-radius: 45% 55% 0 0 / 65% 65% 0 0;
+            background: rgba(96, 165, 250, 0.35);
+            animation: calendar-water-wave 7s linear infinite;
+            will-change: transform;
+        }
+        .calendar-water::after {
+            top: -9px;
+            opacity: 0.7;
+            background: rgba(59, 130, 246, 0.42);
+            animation-duration: 5.5s;
+            animation-direction: reverse;
+        }
+        .calendar-percentage {
+            color: #F4F4F5;
+            text-shadow: 0 1px 8px rgba(9, 9, 11, 0.72);
+        }
+        .calendar-day-cell--empty .calendar-percentage { color: #A1A1AA; text-shadow: none; }
+        .summary-status--muted { background-color: #3F3F46; color: #A1A1AA; }
+        @keyframes calendar-water-wave {
+            from { transform: translate3d(0, 0, 0); }
+            50% { transform: translate3d(12%, 2px, 0); }
+            to { transform: translate3d(24%, 0, 0); }
+        }
+        @media (max-width: 640px) {
+            .calendar-water::before, .calendar-water::after { top: -9px; height: 18px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .calendar-water::before, .calendar-water::after { animation: none; }
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface overflow-x-hidden">
+<!-- Top AppBar Navigation Shell -->
+<header class="fixed top-0 w-full bg-background border-b border-outline-variant z-50">
+<div class="flex justify-between items-center px-gutter h-16 max-w-container-max mx-auto">
+<div class="flex items-center gap-stack-sm cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-primary" data-icon="target">target</span>
+<span class="font-headline-md text-headline-md font-bold text-on-surface">DeepWork</span>
+</div>
+<div class="flex items-center gap-gutter">
+<nav class="hidden md:flex items-center gap-stack-lg">
+<a class="font-label-md text-label-md text-primary font-bold border-l-4 border-primary pl-4 transition-colors" href="calendar.html" aria-current="page">Calendar</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pl-4" href="focus-timer.html">Focus Timer</a>
+</nav>
+<div class="cursor-pointer active:scale-95 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Sidebar / Navigation Drawer -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 border-r border-outline-variant hidden md:flex flex-col gap-stack-md py-stack-lg bg-surface">
+<div class="px-gutter mb-stack-md">
+<h2 class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-widest">Productivity</h2>
+</div>
+<div class="flex flex-col gap-unit">
+<a class="text-primary font-bold border-l-4 border-primary pl-4 py-stack-sm bg-surface-container-low cursor-pointer flex items-center gap-stack-sm" href="calendar.html" aria-current="page">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</a>
+<a class="text-on-surface-variant pl-4 py-stack-sm hover:bg-surface-container-low transition-colors cursor-pointer flex items-center gap-stack-sm" href="focus-timer.html">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+<span class="font-label-md text-label-md">Focus Timer</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:pl-64 pt-16 pb-16 md:pb-0 min-h-screen lg:h-screen overflow-y-auto lg:overflow-hidden flex flex-col lg:flex-row bg-[#09090B]">
+<!-- Center Calendar Area -->
+<section class="w-full lg:w-[72%] p-4 sm:p-6 overflow-y-auto">
+<div class="max-w-6xl mx-auto">
+<!-- Calendar Header -->
+<div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between mb-6">
+<div class="flex flex-col">
+<h1 class="font-headline-lg text-headline-lg text-[#F4F4F5]">Calendar</h1>
+<p class="font-label-md text-label-md text-[#A1A1AA]" id="calendar-month-title">Loading month...</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="monthly-session-count">Loading focus sessions...</p>
+</div>
+<div class="flex flex-wrap items-center gap-2">
+<div class="flex items-center gap-stack-sm px-stack-md h-10 bg-[#18181B] border border-[#3F3F46] rounded-lg" id="daily-goal-control">
+<div class="flex flex-col leading-none">
+<span class="font-label-sm text-[10px] text-on-surface-variant">Daily Goal</span>
+<span class="font-label-md text-label-md text-primary" id="daily-goal-display">—</span>
+</div>
+<button type="button" class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-surface-container-high transition-colors focus:outline-none focus:ring-1 focus:ring-primary" id="daily-goal-edit" aria-label="Edit daily focus goal">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<form class="hidden items-center gap-unit" id="daily-goal-form">
+<label class="sr-only" for="daily-goal-input">Daily focus goal in minutes</label>
+<input class="w-20 h-8 rounded-md bg-surface-container-high border border-outline-variant text-on-surface text-sm px-2 focus:border-primary focus:ring-primary" id="daily-goal-input" type="number" min="15" max="1440" step="1" inputmode="numeric"/>
+<button type="submit" class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-surface-container-high focus:outline-none focus:ring-1 focus:ring-primary" aria-label="Save daily focus goal">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<button type="button" class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-surface-container-high focus:outline-none focus:ring-1 focus:ring-primary" id="daily-goal-cancel" aria-label="Cancel daily focus goal editing">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</form>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg ghost-border hover:bg-surface-container-high transition-all active:scale-90" id="previous-month" aria-label="Previous month">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="px-stack-md h-10 font-label-md text-label-md ghost-border rounded-lg hover:bg-surface-container-high transition-all active:scale-95" id="today-button">Today</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg ghost-border hover:bg-surface-container-high transition-all active:scale-90" id="next-month" aria-label="Next month">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<p class="hidden mb-stack-md p-stack-sm rounded-lg bg-surface-container-low border border-outline-variant font-label-sm text-label-sm text-on-surface-variant" id="calendar-error" role="status"></p>
+<!-- Calendar Grid -->
+<div class="calendar-grid border-l border-t border-[#3F3F46]">
+<!-- Week Headers -->
+<div class="p-stack-sm border-r border-b border-[#3F3F46] text-center font-label-sm text-label-sm text-[#A1A1AA]">MON</div>
+<div class="p-stack-sm border-r border-b border-[#3F3F46] text-center font-label-sm text-label-sm text-[#A1A1AA]">TUE</div>
+<div class="p-stack-sm border-r border-b border-[#3F3F46] text-center font-label-sm text-label-sm text-[#A1A1AA]">WED</div>
+<div class="p-stack-sm border-r border-b border-[#3F3F46] text-center font-label-sm text-label-sm text-[#A1A1AA]">THU</div>
+<div class="p-stack-sm border-r border-b border-[#3F3F46] text-center font-label-sm text-label-sm text-[#A1A1AA]">FRI</div>
+<div class="p-stack-sm border-r border-b border-[#3F3F46] text-center font-label-sm text-label-sm text-[#A1A1AA]">SAT</div>
+<div class="p-stack-sm border-r border-b border-[#3F3F46] text-center font-label-sm text-label-sm text-[#A1A1AA]">SUN</div>
+<!-- Day Cells (Simplified iteration) -->
+<!-- Calendar day cells are rendered by js/calendar.js -->
+</div>
+</div>
+</section>
+<!-- Right Side Panel Summary -->
+<aside class="w-full lg:w-[28%] lg:min-w-[300px] border-t lg:border-t-0 lg:border-l border-[#3F3F46] bg-[#18181B] flex flex-col">
+<div class="p-4 sm:p-6 border-b border-[#3F3F46]">
+<div class="flex items-center justify-between mb-stack-md">
+<h3 class="font-headline-md text-headline-md text-on-surface" id="summary-date">July 15</h3>
+<span class="px-stack-sm py-unit rounded bg-[#3B82F6]/15 text-[#60A5FA] font-label-sm text-label-sm" id="summary-status">No Focus</span>
+</div>
+<div class="grid grid-cols-2 gap-stack-md">
+<div class="p-stack-md rounded-lg bg-surface-container-low border border-outline-variant">
+<p class="font-label-sm text-label-sm text-[#A1A1AA] mb-unit">Focused Time</p>
+<p class="font-headline-md text-headline-md text-on-surface" id="summary-time">0m</p>
+</div>
+<div class="p-stack-md rounded-lg bg-surface-container-low border border-outline-variant">
+<p class="font-label-sm text-label-sm text-[#A1A1AA] mb-unit">Productivity</p>
+<p class="font-headline-md text-headline-md text-primary" id="summary-percentage">0%</p>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 sm:p-6">
+<div>
+<h4 class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-widest mb-stack-md" id="summary-session-count">0 Focus Sessions</h4>
+<div class="space-y-stack-sm" id="summary-session-list"></div>
+</div>
+</div>
+</aside>
+</main>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 pb-safe bg-surface border-t border-outline-variant">
+<a class="flex flex-col items-center justify-center text-primary" href="calendar.html" aria-current="page">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-sm text-[10px]">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="focus-timer.html">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+<span class="font-label-sm text-[10px]">Timer</span>
+</a>
+</nav>
+<!-- Calendar behavior -->
+<script src="js/storage.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/calendar.js"></script>
+</body></html>
